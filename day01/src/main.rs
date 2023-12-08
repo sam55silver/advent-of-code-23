@@ -1,58 +1,36 @@
-use std::{env, io::{self, BufRead, BufReader}, fs::File};
+use std::{env, io::{self, BufRead, BufReader}, fs::File, u32};
 
+fn get_digit(view: &str) -> Option<u32> {
+    match view.chars().next().unwrap().to_digit(10) {
+        Some(num) => Some(num),
+        None => {
+            for i in 0..=view.len() {
+                match &view[0..i] {
+                    "one" => return Some(1),
+                    "two" => return Some(2),
+                    "three" => return Some(3),
+                    "four" => return Some(4),
+                    "five" => return Some(5),
+                    "six" => return Some(6),
+                    "seven" => return Some(7),
+                    "eight" => return Some(8),
+                    "nine" => return Some(9),
+                    _ => continue
+                };
+            }
+            None
+        }
+    }
+}
 
 fn get_calibration(line: &str) -> u32 {
     let mut nums: Vec<u32> = Vec::new();
-    let mut word = String::new();
 
-    for ch in line.chars() {
-        // If a num then add to list of nums
-        // If not, add it to
-        match ch.to_digit(10) {
-            Some(num) => {
-                nums.push(num);
-                word = String::new();
-            },
-            None => word.push(ch)
+    for i in 0..line.len() {
+        match get_digit(&line[i..]) {
+            Some(num) => nums.push(num),
+            None => continue,
         }
-        
-        if word.contains("one") {
-            nums.push(1);
-            word = String::new();
-        } 
-        else if word.contains("two") { 
-            nums.push(2);
-            word = String::new();
-        } 
-        else if word.contains("three") { 
-            nums.push(3);
-            word = String::new();
-        } 
-        else if word.contains("four") {
-            nums.push(4);
-            word = String::new();
-        } 
-        else if word.contains("five") { 
-            nums.push(5);
-            word = String::new();
-        } 
-        else if word.contains("six") { 
-            nums.push(6);
-            word = String::new();
-        } 
-        else if word.contains("seven") { 
-            nums.push(7);
-            word = String::new();
-        } 
-        else if word.contains("eight") {
-            nums.push(8);
-            word = String::new();
-
-        } 
-        else if word.contains("nine") { 
-            nums.push(9);
-            word = String::new();
-        }; 
     }
 
     return (nums[0] * 10) + nums.last().unwrap();
@@ -87,10 +65,6 @@ fn main() {
         }
     };
 
-    for num in &nums {
-        println!("{num}");
-    }
-
     let sum: u32 = nums.iter().sum();
-    println!("Calibration Values: {sum}");
+    println!("Calibration: {sum}");
 }
