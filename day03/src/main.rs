@@ -36,17 +36,32 @@ fn main() {
     let path_inputs = &args[1];
     let grid = create_grid(path_inputs);
 
-    for i in 1..(grid.len() - 1) {
+    let mut real_nums: Vec<u32> = Vec::new();
+    for i in 1..=(grid.len() - 1) {
         let mut num: Vec<usize> = Vec::new();
-        for j in 1..(grid[i].len() - 1) {
+        for j in 1..=(grid[i].len() - 1) {
             let c = &grid[i][j];
             if c.is_digit(10) {
                 num.push(j);
             } else if num.len() > 0 {
-                let number: String = num.iter().map(|loc| &grid[i][*loc]).collect();
-                println!("{number}");
+                let start = num.get(0).unwrap() - 1;
+                let end = num.get(num.len() - 1).unwrap() + 1;
+    
+                'outer: for k in (i-1)..=(i+1) {
+                    for l in start..=end {
+                        if !grid[k][l].is_digit(10) && grid[k][l] != '.' {
+                            let number: String = num.iter().map(|loc| &grid[i][*loc]).collect();
+                            real_nums.push(number.parse::<u32>().unwrap());
+                            break 'outer;
+                        }
+    
+                    }
+                }
                 num.clear();
             }
         }
     }
+    
+    let sum: u32 = real_nums.iter().sum();
+    println!("Sum: {}", sum);
 }
