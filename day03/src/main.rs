@@ -79,6 +79,7 @@ fn part2(real_nums: &mut Vec<u32>, grid: &Vec<Vec<char>>) {
 
                 if cog_nums.len() == 2 { 
                     let mut cog: Vec<u32> = Vec::new();
+                    // Scan each number in cog and multiply them
                     for pos in cog_nums {
                         let mut number: String = String::new();
                         // move right
