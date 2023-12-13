@@ -1,7 +1,17 @@
 use core::panic;
-use std::env;
+use std::{env, fs::File, io::{BufReader, BufRead}};
 
-pub fn get_input_lines() {
+fn read_file(path: &str) -> Vec<String> {
+    let file = File::open(path).expect("Failed to open path: {path}");
+    let reader = BufReader::new(file);
+
+    match reader.lines().collect() {
+        Ok(lines) => lines,
+        Err(e) => panic!("Error reading lines in {}, Error: {:?}", path, e)
+    }
+}
+
+pub fn get_input_lines() -> (Vec<String>, u32) {
     let args: Vec<String> = env::args().collect();
     
     let sys_exit = || {
@@ -9,18 +19,18 @@ pub fn get_input_lines() {
         std::process::exit(1);   
     };
 
-    if args.len() != 2 {
+    if args.len() < 2 {
         sys_exit();
     }
 
-    let mut test = false;
     if args.len() == 3 {
         if args[2] == "test" {
-            test = true;
+            return (read_file("test-input.txt"), args[1].parse().unwrap())
         } else {
             sys_exit();
         }
     }
 
+    (read_file("input.txt"), args[1].parse().unwrap())
 }
 
