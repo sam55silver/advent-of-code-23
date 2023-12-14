@@ -13,28 +13,42 @@ enum HandType {
 }
 
 #[derive(Debug)]
-#[derive(PartialEq)]
 struct Hand {
     cards: Vec<char>,
     bet: u64,
     kind: HandType
 }
 
-impl PartialOrd for Hand {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        if  
-    }
-}
+fn get_kind(cards: &Vec<char>) -> HandType {
+    let mut char_count = std::collections::HashMap::new();
 
-fn get_kind(cards: &Vec<char>) {
-    let dups: Vec<uszie> = if let Some((i, &first_char)) = chars.iter().enumerate().find(|(i, &c)| chars[..*i].contains(&c)) {
-        chars.iter().enumerate()
-            .filter(|&(i, &c)| i != index && c == first_char)
-            .map(|(i, _)| i)
-            .collect()
-    } else {
-        Vec::new()
-    };
+    for card in cards {
+        let count = char_count.entry(card).or_insert(0);
+        *count += 1;
+    }
+
+    let kind = match char_count.len() {
+        1 => HandType::Five,
+        2 => {
+            if char_count.values().any(|&x| x == 4) {
+                HandType::Four
+            } else {
+                HandType::Full
+            }
+        },
+        3 => {
+            if char_count.values().any(|&x| x == 3) {
+                HandType::Three
+            } else {
+                HandType::Two
+            }
+        },
+        4 => HandType::One,
+        5 => HandType::High,
+        _ => panic!("Invalid hand")
+    };  
+
+    kind
 }
 
 fn main() {
@@ -43,14 +57,15 @@ fn main() {
         .iter()
         .map(|line| {
             let mut line_div = line.split_whitespace();
+            let cards = line_div.next().unwrap().chars().collect();
+            let kind = get_kind(&cards);
             Hand {
-                cards: line_div.next().unwrap().chars().collect(),
-                bet: line_div.next().unwrap().parse().unwrap()
+                cards, 
+                bet: line_div.next().unwrap().parse().unwrap(),
+                kind
             }
         })
         .collect();
 
     println!("{:?}", hands);
-    
-
 }
