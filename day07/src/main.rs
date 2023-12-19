@@ -1,22 +1,35 @@
 use utilities::get_input_lines;
 
-#[derive(Debug)]
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq, PartialOrd)]
 enum HandType {
-    Five,
-    Four,
-    Full,
-    Three,
-    Two,
+    High,
     One,
-    High
+    Two,
+    Three,
+    Full,
+    Four,
+    Five,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 struct Hand {
     cards: Vec<char>,
     bet: u64,
-    kind: HandType
+    kind: HandType,
+}
+
+impl PartialOrd for Hand {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        if self.kind == other.kind {
+            self.cards.iter().for_each(|c| {
+                other.cards.iter().for_each(|o| {
+                    match 
+                })
+            })
+        } else {
+            
+        }
+    }
 }
 
 fn get_kind(cards: &Vec<char>) -> HandType {
@@ -35,18 +48,18 @@ fn get_kind(cards: &Vec<char>) -> HandType {
             } else {
                 HandType::Full
             }
-        },
+        }
         3 => {
             if char_count.values().any(|&x| x == 3) {
                 HandType::Three
             } else {
                 HandType::Two
             }
-        },
+        }
         4 => HandType::One,
         5 => HandType::High,
-        _ => panic!("Invalid hand")
-    };  
+        _ => panic!("Invalid hand"),
+    };
 
     kind
 }
@@ -60,12 +73,15 @@ fn main() {
             let cards = line_div.next().unwrap().chars().collect();
             let kind = get_kind(&cards);
             Hand {
-                cards, 
+                cards,
                 bet: line_div.next().unwrap().parse().unwrap(),
-                kind
+                kind,
             }
         })
         .collect();
 
-    println!("{:?}", hands);
+    let type1 = HandType::Five;
+    let type2 = HandType::High;
+
+    println!("{:?}", type1 > type2);
 }
