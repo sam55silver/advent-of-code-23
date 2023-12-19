@@ -1,6 +1,6 @@
 use utilities::get_input_lines;
 
-#[derive(Debug, PartialOrd, Eq, Ord)]
+#[derive(Debug, PartialOrd, Eq, Ord, PartialEq)]
 enum Card {
     Two,
     Three,
@@ -17,66 +17,7 @@ enum Card {
     Ace, // 14
 }
 
-impl PartialEq for Card {
-    fn eq(&self, other: &Self) -> bool {
-        match self {
-            Card::Two => match other {
-                Card::Two => true,
-                _ => false,
-            },
-            Card::Three => match other {
-                Card::Three => true,
-                _ => false,
-            },
-            Card::Four => match other {
-                Card::Four => true,
-                _ => false,
-            },
-            Card::Five => match other {
-                Card::Five => true,
-                _ => false,
-            },
-            Card::Six => match other {
-                Card::Six => true,
-                _ => false,
-            },
-            Card::Seven => match other {
-                Card::Seven => true,
-                _ => false,
-            },
-            Card::Eight => match other {
-                Card::Eight => true,
-                _ => false,
-            },
-            Card::Nine => match other {
-                Card::Nine => true,
-                _ => false,
-            },
-            Card::Ten => match other {
-                Card::Ten => true,
-                _ => false,
-            },
-            Card::Jack => match other {
-                Card::Jack => true,
-                _ => false,
-            },
-            Card::Queen => match other {
-                Card::Queen => true,
-                _ => false,
-            },
-            Card::King => match other {
-                Card::King => true,
-                _ => false,
-            },
-            Card::Ace => match other {
-                Card::Ace => true,
-                _ => false,
-            },
-        }
-    }
-}
-
-#[derive(Debug, PartialOrd, Ord, Eq)]
+#[derive(Debug, PartialOrd, Ord, Eq, PartialEq)]
 enum HandType {
     High,
     One,
@@ -87,40 +28,6 @@ enum HandType {
     Five,
 }
 
-impl PartialEq for HandType {
-    fn eq(&self, other: &Self) -> bool {
-        match self {
-            HandType::High => match other {
-                HandType::High => true,
-                _ => false,
-            },
-            HandType::One => match other {
-                HandType::One => true,
-                _ => false,
-            },
-            HandType::Two => match other {
-                HandType::Two => true,
-                _ => false,
-            },
-            HandType::Three => match other {
-                HandType::Three => true,
-                _ => false,
-            },
-            HandType::Full => match other {
-                HandType::Full => true,
-                _ => false,
-            },
-            HandType::Four => match other {
-                HandType::Four => true,
-                _ => false,
-            },
-            HandType::Five => match other {
-                HandType::Five => true,
-                _ => false,
-            },
-        }
-    }
-}
 
 #[derive(Debug, PartialEq, Eq)]
 struct Hand {
