@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use utilities::get_input_lines;
 
 #[derive(Debug, PartialOrd, Eq, Ord, PartialEq)]
@@ -144,6 +146,8 @@ impl HandP2 {
                 if char_count.contains_key(&'J') {
                     if char_count.values().any(|&x| x == 3) {
                         HandType::Four
+                    } else if char_count.get(&'J').unwrap() == &2 {
+                        HandType::Four
                     } else {
                         HandType::Full
                     }
@@ -157,11 +161,7 @@ impl HandP2 {
             }
             4 => {
                 if char_count.contains_key(&'J') {
-                    if char_count.get(&'J').unwrap() == &2 {
-                        HandType::Three
-                    } else {
-                        HandType::Two
-                    }
+                    HandType::Three
                 } else {
                     HandType::One
                 }
@@ -260,7 +260,7 @@ trait HasBet {
 
 fn get_winnings<T>(hands: &mut Vec<T>) 
 where 
-    T: Ord + HasBet
+    T: Ord + HasBet + Debug
 {
     hands.sort();
     
