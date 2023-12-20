@@ -15,7 +15,7 @@ pub fn get_input_lines() -> (Vec<String>, u32) {
     let args: Vec<String> = env::args().collect();
     
     let sys_exit = || {
-        eprintln!("Usage: {} <part: 1 || 2> [test]", args[0]);
+        eprintln!("Usage: {} <part: 1 || 2> [test || test2]", args[0]);
         std::process::exit(1);   
     };
 
@@ -26,6 +26,8 @@ pub fn get_input_lines() -> (Vec<String>, u32) {
     if args.len() == 3 {
         if args[2] == "test" {
             return (read_file("test-input.txt"), args[1].parse().unwrap())
+        } else if args[2] == "test2" {
+            return (read_file("test-input2.txt"), args[1].parse().unwrap())
         } else {
             sys_exit();
         }
