@@ -69,50 +69,78 @@ impl Map {
         }
     }
 
+    fn get_pos(&self, x: i64, y: i64) -> Option<Pos> {
+        if x < 0 || y < 0 {
+            return None;
+        }
+
+        if y >= self.map.len() as i64 {
+            return None;
+        }
+
+        if x >= self.map[y as usize].len() as i64 {
+            return None;
+        }
+
+        Some(Pos { x: x as usize, y: y as usize })
+    }
+
     // TODO: Make a get_pos fn to return some(pos) only if in map boundary
     fn find_connections(&self, pos: Pos) -> Vec<Pos> {
         println!("Pos: {:?}", pos);
-        let up = Pos { x: pos.x, y: pos.y - 1 };
-        let down = Pos { x: pos.x, y: pos.y + 1 };
-        let left = Pos { x: pos.x - 1, y: pos.y };
-        let right = Pos { x: pos.x + 1, y: pos.y };
+        let up = self.get_pos(pos.x as i64, pos.y as i64 - 1);
+        let down = self.get_pos(pos.x as i64, pos.y as i64 + 1);
+        let left = self.get_pos(pos.x as i64 - 1, pos.y as i64);
+        let right = self.get_pos(pos.x as i64 + 1, pos.y as i64);
 
         let mut locs: Vec<Pos> = Vec::new();
-        match self.get_pipe(up) {
-            Some(pipe) => {
-                match pipe {
-                    Pipes::SW => locs.push(up),
-                    Pipes::SE => locs.push(up),
-                    Pipes::NS => locs.push(up),
+        match up {
+            Some(up) => match self.get_pipe(up) {
+                Some(pipe) => {
+                    match pipe {
+                        Pipes::SW => locs.push(up),
+                        Pipes::SE => locs.push(up),
+                        Pipes::NS => locs.push(up),
+                        _ => ()
+                    }
+                },
+                None => ()
+            },
+            None => ()
+        }
+        match down {
+            Some(down) => match self.get_pipe(down) {
+                Some(pipe) => match pipe {
+                    Pipes::NE => locs.push(down),
+                    Pipes::NW => locs.push(down),
+                    Pipes::NS => locs.push(down),
                     _ => ()
-                }
+                },
+                None => ()
             },
             None => ()
         }
-        match self.get_pipe(down) {
-            Some(pipe) => match pipe {
-                Pipes::NE => locs.push(down),
-                Pipes::NW => locs.push(down),
-                Pipes::NS => locs.push(down),
-                _ => ()
+        match left {
+            Some(left) => match self.get_pipe(left) {
+                Some(pipe) => match pipe {
+                    Pipes::SE => locs.push(left),
+                    Pipes::NE => locs.push(left),
+                    Pipes::EW => locs.push(left),
+                    _ => ()
+                },
+                None => ()
             },
-            None => ()
+            None =>()
         }
-        match self.get_pipe(left) {
-            Some(pipe) => match pipe {
-                Pipes::SE => locs.push(left),
-                Pipes::NE => locs.push(left),
-                Pipes::EW => locs.push(left),
-                _ => ()
-            },
-            None => ()
-        }
-        match self.get_pipe(right) {
-            Some(pipe) => match pipe {
-                Pipes::NW => locs.push(right),
-                Pipes::SW => locs.push(right),
-                Pipes::EW => locs.push(right),
-                _ => ()
+        match right {
+            Some(right) => match self.get_pipe(right) {
+                Some(pipe) => match pipe {
+                    Pipes::NW => locs.push(right),
+                    Pipes::SW => locs.push(right),
+                    Pipes::EW => locs.push(right),
+                    _ => ()
+                },
+                None => ()
             },
             None => ()
         }
