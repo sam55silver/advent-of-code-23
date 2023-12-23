@@ -85,7 +85,6 @@ impl Map {
         Some(Pos { x: x as usize, y: y as usize })
     }
 
-    // TODO: Make a get_pos fn to return some(pos) only if in map boundary
     fn find_connections(&self, pos: Pos) -> Vec<Pos> {
         println!("Pos: {:?}", pos);
         let up = self.get_pos(pos.x as i64, pos.y as i64 - 1);
