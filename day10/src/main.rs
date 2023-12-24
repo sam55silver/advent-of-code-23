@@ -14,6 +14,19 @@ enum Pipes {
     Start
 }
 
+enum Direction {
+    North,
+    South,
+    East,
+    West
+}
+
+struct PipeDirection {
+    pipe: Pipes,
+    dir: Direction,
+    pos: Pos
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct Pos {
     x: usize,
@@ -83,6 +96,30 @@ impl Map {
         }
 
         Some(Pos { x: x as usize, y: y as usize })
+    }
+
+    fn find_forward_connections(&self, pipe: PipeDirection) -> PipeDirection {
+        match pipe.dir {
+            Direction::East => {
+                let new_pos = self.get_pos((pipe.pos.x + 1) as i64, pipe.pos.y as i64).unwrap();
+                let new_pipe = self.get_pipe(new_pos);
+                match new_pipe.unwrap() {
+                    Pipes::SW => PipeDirection { pipe: new_pipe, dir: Direction::South, pos: new_pos },
+                    Pipes::NW => PipeDirection { pipe: new_pipe, dir: Direction::North, pos: new_pos },
+                    Pipes::EW => PipeDirection { pipe: new_pipe, dir: Direction::East, pos: new_pos },
+                    _ => panic!("No direction!")
+                }
+            },
+            Direction::West => {
+                let new_pos = self.get_pos((pipe.pos.x - 1) as i64, pipe.pos.y as i64).unwrap();
+                let new_pipe = self.get_pipe(new_pos);
+                match new_pipe.unwrap() {
+                    Pipes::EW => PipeDirection { pipe: new_pipe, dir: Direction::West, pos: new_pos },
+                    Pipes::NE => 
+                }
+            }
+        }
+        
     }
 
     fn find_connections(&self, pos: Pos) -> Vec<Pos> {
