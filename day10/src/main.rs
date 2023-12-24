@@ -86,7 +86,6 @@ impl Map {
     }
 
     fn find_connections(&self, pos: Pos) -> Vec<Pos> {
-        println!("Pos: {:?}", pos);
         let up = self.get_pos(pos.x as i64, pos.y as i64 - 1);
         let down = self.get_pos(pos.x as i64, pos.y as i64 + 1);
         let left = self.get_pos(pos.x as i64 - 1, pos.y as i64);
@@ -152,13 +151,14 @@ fn main() {
     let (lines, _part) = get_input_lines();
 
     let map = Map::new(lines.iter().map(|line| line.chars().collect()).collect());
-    println!("{}", map);
     let postions_start = map.find_connections(map.start);
     let mut last_pos = map.start;
     let mut curr_pos = postions_start[0];
+    let mut steps = 1;
     loop {
         let pipe = map.get_pipe(curr_pos);
-        println!("Pipe: {:?}", pipe.unwrap());
+        steps += 1;
+        println!("Pipe: {:?}, Steps: {}", pipe.unwrap(), steps);
 
         let next_positions: Vec<Pos> = map.find_connections(curr_pos);
         match next_positions.iter().filter(|p| **p != last_pos).collect::<Vec<&Pos>>().first() {
@@ -168,7 +168,6 @@ fn main() {
             },
             None => break
         }
-       
     }
-    println!("Loop complete")
+    println!("Furthest pipe: {:?}", steps / 2);
 }
