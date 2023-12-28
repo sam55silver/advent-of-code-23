@@ -2,7 +2,7 @@ use std::fmt::{Display, Result, Formatter};
 
 use utilities::get_input_lines;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 enum Pipes {
     NS,
     EW,
@@ -14,6 +14,7 @@ enum Pipes {
     Start
 }
 
+#[derive(Debug, Clone, Copy)]
 enum Direction {
     North,
     South,
@@ -21,6 +22,7 @@ enum Direction {
     West
 }
 
+#[derive(Debug, Clone, Copy)]
 struct PipeDirection {
     pipe: Pipes,
     dir: Direction,
@@ -102,40 +104,66 @@ impl Map {
         match pipe.dir {
             Direction::East => {
                 let new_pos = self.get_pos((pipe.pos.x + 1) as i64, pipe.pos.y as i64).unwrap();
-                let new_pipe = self.get_pipe(new_pos);
-                match new_pipe.unwrap() {
-                    Pipes::SW => PipeDirection { pipe: new_pipe, dir: Direction::South, pos: new_pos },
-                    Pipes::NW => PipeDirection { pipe: new_pipe, dir: Direction::North, pos: new_pos },
-                    Pipes::EW => PipeDirection { pipe: new_pipe, dir: Direction::East, pos: new_pos },
+                let new_pipe = self.get_pipe(new_pos).unwrap();
+                match new_pipe {
+                    Pipes::SW => PipeDirection { pipe: *new_pipe, dir: Direction::South, pos: new_pos },
+                    Pipes::NW => PipeDirection { pipe: *new_pipe, dir: Direction::North, pos: new_pos },
+                    Pipes::EW => PipeDirection { pipe: *new_pipe, dir: Direction::East, pos: new_pos },
+                    Pipes::Start => PipeDirection { pipe: *new_pipe, dir: Direction::North, pos: new_pos },
                     _ => panic!("No direction!")
                 }
             },
             Direction::West => {
                 let new_pos = self.get_pos((pipe.pos.x - 1) as i64, pipe.pos.y as i64).unwrap();
-                let new_pipe = self.get_pipe(new_pos);
-                match new_pipe.unwrap() {
-                    Pipes::EW => PipeDirection { pipe: new_pipe, dir: Direction::West, pos: new_pos },
-                    Pipes::NE => 
+                let new_pipe = self.get_pipe(new_pos).unwrap();
+                match new_pipe {
+                    Pipes::EW => PipeDirection { pipe: *new_pipe, dir: Direction::West, pos: new_pos },
+                    Pipes::SE => PipeDirection { pipe: *new_pipe, dir: Direction::South, pos: new_pos },
+                    Pipes::NE => PipeDirection { pipe: *new_pipe, dir: Direction::North, pos: new_pos },
+                    Pipes::Start => PipeDirection { pipe: *new_pipe, dir: Direction::North, pos: new_pos },
+                    _ => panic!("No direction!")
+                }
+            },
+            Direction::North => {
+                let new_pos = self.get_pos(pipe.pos.x as i64, (pipe.pos.y - 1) as i64).unwrap();
+                let new_pipe = self.get_pipe(new_pos).unwrap();
+                match new_pipe {
+                    Pipes::SW => PipeDirection { pipe: *new_pipe, dir: Direction::West, pos: new_pos },
+                    Pipes::SE => PipeDirection { pipe: *new_pipe, dir: Direction::East, pos: new_pos },
+                    Pipes::NS => PipeDirection { pipe: *new_pipe, dir: Direction::North, pos: new_pos },
+                    Pipes::Start => PipeDirection { pipe: *new_pipe, dir: Direction::North, pos: new_pos },
+                    _ => panic!("No direction!")
+                }
+            },
+            Direction::South => {
+                let new_pos = self.get_pos(pipe.pos.x as i64, (pipe.pos.y + 1) as i64).unwrap();
+                let new_pipe = self.get_pipe(new_pos).unwrap();
+                match new_pipe {
+                    Pipes::NE => PipeDirection { pipe: *new_pipe, dir: Direction::East, pos: new_pos },
+                    Pipes::NS => PipeDirection { pipe: *new_pipe, dir: Direction::South, pos: new_pos },
+                    Pipes::NW => PipeDirection { pipe: *new_pipe, dir: Direction::West, pos: new_pos },
+                    Pipes::Start => PipeDirection { pipe: *new_pipe, dir: Direction::North, pos: new_pos },
+                   _ => panic!("No direction!")
                 }
             }
         }
         
     }
 
-    fn find_connections(&self, pos: Pos) -> Vec<Pos> {
+    fn find_connections(&self, pos: Pos) -> Vec<PipeDirection> {
         let up = self.get_pos(pos.x as i64, pos.y as i64 - 1);
         let down = self.get_pos(pos.x as i64, pos.y as i64 + 1);
         let left = self.get_pos(pos.x as i64 - 1, pos.y as i64);
         let right = self.get_pos(pos.x as i64 + 1, pos.y as i64);
 
-        let mut locs: Vec<Pos> = Vec::new();
+        let mut locs: Vec<PipeDirection> = Vec::new();
         match up {
             Some(up) => match self.get_pipe(up) {
                 Some(pipe) => {
                     match pipe {
-                        Pipes::SW => locs.push(up),
-                        Pipes::SE => locs.push(up),
-                        Pipes::NS => locs.push(up),
+                        Pipes::SW => locs.push(PipeDirection { pipe: *pipe, dir: Direction::West, pos: up}),
+                        Pipes::SE => locs.push(PipeDirection { pipe: *pipe, dir: Direction::East, pos: up}),
+                        Pipes::NS => locs.push(PipeDirection { pipe: *pipe, dir: Direction::North, pos: up}),
                         _ => ()
                     }
                 },
@@ -146,9 +174,9 @@ impl Map {
         match down {
             Some(down) => match self.get_pipe(down) {
                 Some(pipe) => match pipe {
-                    Pipes::NE => locs.push(down),
-                    Pipes::NW => locs.push(down),
-                    Pipes::NS => locs.push(down),
+                    Pipes::NE => locs.push(PipeDirection { pipe: *pipe, dir: Direction::East, pos: down }),
+                    Pipes::NW => locs.push(PipeDirection { pipe: *pipe, dir: Direction::West, pos: down }),
+                    Pipes::NS => locs.push(PipeDirection { pipe: *pipe, dir: Direction::South, pos: down }),
                     _ => ()
                 },
                 None => ()
@@ -158,9 +186,9 @@ impl Map {
         match left {
             Some(left) => match self.get_pipe(left) {
                 Some(pipe) => match pipe {
-                    Pipes::SE => locs.push(left),
-                    Pipes::NE => locs.push(left),
-                    Pipes::EW => locs.push(left),
+                    Pipes::NE => locs.push(PipeDirection { pipe: *pipe, dir: Direction::North, pos: left }),
+                    Pipes::SE => locs.push(PipeDirection { pipe: *pipe, dir: Direction::South, pos: left }),
+                    Pipes::EW => locs.push(PipeDirection { pipe: *pipe, dir: Direction::West, pos: left }),
                     _ => ()
                 },
                 None => ()
@@ -170,9 +198,9 @@ impl Map {
         match right {
             Some(right) => match self.get_pipe(right) {
                 Some(pipe) => match pipe {
-                    Pipes::NW => locs.push(right),
-                    Pipes::SW => locs.push(right),
-                    Pipes::EW => locs.push(right),
+                    Pipes::NW => locs.push(PipeDirection { pipe: *pipe, dir: Direction::North, pos: right }),
+                    Pipes::SW => locs.push(PipeDirection { pipe: *pipe, dir: Direction::South, pos: right }),
+                    Pipes::EW => locs.push(PipeDirection { pipe: *pipe, dir: Direction::East, pos: right }),
                     _ => ()
                 },
                 None => ()
@@ -189,22 +217,15 @@ fn main() {
 
     let map = Map::new(lines.iter().map(|line| line.chars().collect()).collect());
     let postions_start = map.find_connections(map.start);
-    let mut last_pos = map.start;
-    let mut curr_pos = postions_start[0];
+    let mut curr_pos = postions_start.first().unwrap().clone(); 
     let mut steps = 1;
     loop {
-        let pipe = map.get_pipe(curr_pos);
         steps += 1;
-        println!("Pipe: {:?}, Steps: {}", pipe.unwrap(), steps);
-
-        let next_positions: Vec<Pos> = map.find_connections(curr_pos);
-        match next_positions.iter().filter(|p| **p != last_pos).collect::<Vec<&Pos>>().first() {
-            Some(forward_pos) => {
-                last_pos = curr_pos;
-                curr_pos = **forward_pos;
-            },
-            None => break
+        let next_position: PipeDirection = map.find_forward_connections(curr_pos);
+        if next_position.pipe == Pipes::Start {
+            break;
         }
+        curr_pos = next_position.clone();
     }
     println!("Furthest pipe: {:?}", steps / 2);
 }
