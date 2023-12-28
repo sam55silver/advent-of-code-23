@@ -15,7 +15,7 @@ fn manhattan_distance(g1: &Galaxy, g2: &Galaxy) -> i64 {
 }
 
 fn main() {
-    let (line, _part) = get_input_lines();
+    let (line, part) = get_input_lines();
 
     let mut galaxies: Vec<Galaxy> = Vec::new();
 
@@ -46,18 +46,27 @@ fn main() {
 
     let get_offset_galaxy = |g: &Galaxy| -> Galaxy {
         let row_offset_count = row_offsets.iter().filter(|row_i| g.y as usize > **row_i).count();
-        let new_y = g.y as usize + 2 * row_offset_count;
-
         let column_offset_count = column_offsets.iter().filter(|column_i| g.x as usize > **column_i).count();
-        let new_x = g.x as usize + 2 * column_offset_count;
+
+        let new_y = if part == 1 { 
+            g.y as usize + row_offset_count 
+        } else {
+            g.y as usize + (row_offset_count * 1000000 - row_offset_count)
+        };
+
+        let new_x = if part == 1 {
+            g.x as usize + column_offset_count
+        } else {
+            g.x as usize + (column_offset_count * 1000000 - column_offset_count)
+        };
 
         Galaxy { x: new_x as i64, y: new_y as i64 }
     };
 
     let mut pairs: Vec<(&Galaxy, &Galaxy)> = Vec::new();
     let mut path_sum: i64 = 0;
-    for (g1_i, g1) in galaxies.iter().enumerate() {
-        for (g2_i, g2) in  galaxies.iter().enumerate() {
+    for g1 in &galaxies {
+        for g2 in  &galaxies {
             if g1 == g2 { continue };
 
             let matches = pairs.iter().filter(|existing_pair| is_pair(**existing_pair, (g1, g2))).count();
@@ -69,7 +78,6 @@ fn main() {
 
             let sum = manhattan_distance(&off_g1, &off_g2);
             path_sum += sum;
-            println!("Galaxy {} and {}: {}", g1_i + 1, g2_i + 1, sum);
 
             pairs.push((g1, g2))
         }
